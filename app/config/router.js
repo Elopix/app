@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { NavigationComponent } from 'react-native-material-bottom-navigation-performance'
 
-import {Image, Button} from 'react-native';
+import {Image,Alert,Button} from 'react-native';
 
 import Feed from '../screens/Feed';
 import ScannerQR from '../screens/ScannerQR';
@@ -37,6 +37,34 @@ export const LoginStack = StackNavigator({
 		}
 	},Registration: {
 		screen: Registration,
+		navigationOptions: {
+			title: 'Registreer',
+			headerStyle: {
+
+	      backgroundColor: '#93D500',
+
+	    },
+	    headerRight: (
+	    	<Button
+	    	title="ok"
+								text="Meer"
+								style={{
+      						container: {
+										position: "absolute", bottom: 5, right: 5
+									}
+								}}
+                                onPress={() => this.props.navigation.dispatch(NavigationActions.navigate({
+    								routeName: 'LoginStack',
+    								action: NavigationActions.navigate({ routeName: 'LoginScreen' })
+    								})
+    							)}/>
+      //<Icon name="magnify" size={24} color='white' onPress={this.toggleFiltersBox}/>
+    ),
+	    headerTintColor: '#fff',
+	    headerTitleStyle: {
+	      fontWeight: 'bold',
+	    },
+	}
 	},
   ChangePassword: {
     screen: ChangePassword,

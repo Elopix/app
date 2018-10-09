@@ -46,11 +46,11 @@ export default class Registration extends Component {
       // the user to type their password twice to avoid typing errors
       //the 'succesfull' state variable is used to display the snackbar when logged in
       this.state = {
-        email: 't@t.nl',
-        firstPassword: '123456',
-        secondPassword: '123456',
-        firstName: 't',
-        lastName: 't',
+        email: '',
+        firstPassword: '',
+        secondPassword: '',
+        firstName: '',
+        lastName: '',
 		    succesfull: false,
       };
 
