@@ -87,12 +87,10 @@ class PointCard extends Component {
   }
 
   refreshCard() {
-    console.log("update");
     let localStorage = LocalStorage.getInstance();
     let api = Api.getInstance();
     api.getPoints();
     let points = localStorage.retrieveItem('points').then((points) => {
-        console.log(points);
         if(points != null) {
                 this.setState({card: this.fillCard(points)});
             }
@@ -110,57 +108,96 @@ class PointCard extends Component {
 
 	getFile(id, total){
         if(id <= total){
-            return require('../assets/points/check.png');
+			return  (<View style = { stylesCss.stampFilled}>
+						<Image  style = { stylesCss.stamp}
+									source = {require('../assets/points/1.png')}
+									/>
+						<Image  style = { stylesCss.stamp}
+									source = {require('../assets/points/Check.png')}
+									/>
+					 </View>);
         }
 
         switch(id) {
         case 1:
-            return require('../assets/points/1.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/1.png')}
+							/>);
             break;
         case 2:
-            return require('../assets/points/2.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/2.png')}
+							/>);
             break;
         case 3:
-            return require('../assets/points/3.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/3.png')}
+							/>);
             break;
         case 4:
-            return require('../assets/points/4.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/4.png')}
+							/>);
             break;
         case 5:
-            return require('../assets/points/5.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/5.png')}
+							/>);
             break;
         case 6:
-            return require('../assets/points/6.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/6.png')}
+							/>);
             break;
         case 7:
-            return require('../assets/points/7.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/7.png')}
+							/>);
             break;
         case 8:
-            return require('../assets/points/8.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/8.png')}
+							/>);
             break;
         case 9:
-            return require('../assets/points/9.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/9.png')}
+							/>);
             break;
         case 10:
-            return require('../assets/points/10.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/10.png')}
+							/>);
             break;
         case 11:
-            return require('../assets/points/11.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/11.png')}
+							/>);
             break;
         case 12:
-            return require('../assets/points/12.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/12.png')}
+							/>);
             break;
         case 13:
-            return require('../assets/points/13.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/13.png')}
+							/>);
             break;
         case 14:
-            return require('../assets/points/14.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/14.png')}
+							/>);
             break;
         case 15:
-            return require('../assets/points/15.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/15.png')}
+							/>);
             break;
         default:
-            return require('../assets/points/1.png');
+			return  (<Image  style = { stylesCss.stampFilled}
+							source = {require('../assets/points/1.png')}
+							/>);
         };
     }
 
@@ -172,19 +209,13 @@ class PointCard extends Component {
         holderArray.push(
             <View key = {15 - count} style= {stylesCss.pointCardColumn }>
                 <View style={ stylesCss.pointCardRow}>
-                    <Image  style = { stylesCss.stampFilled}
-                                    source = {this.getFile(count, numOfStamps)}
-                                    />
-                    <Image  style = { stylesCss.stampFilled }
-                                    source = {this.getFile(count+1, numOfStamps)}
-                    />
-                    <Image  style = { stylesCss.stampFilled }
-                                    source = {this.getFile(count+2, numOfStamps)}
-                    />
+                    {this.getFile(count, numOfStamps)}
+					{this.getFile(count +1, numOfStamps)}
+					{this.getFile(count +2, numOfStamps)}
                 </View>
             </View>
         );
-            count = count + 3;
+            count = count +3;
     }
     return holderArray;
   }
@@ -192,6 +223,9 @@ class PointCard extends Component {
   render() {
     return(
 		<ImageBackground blurRadius={3} source={require('../assets/sport_kids_bslim.jpg')} style={{width: '100%', height: '100%'}}>
+		<Toolbar
+			centerElement='Stempelkaart'
+		/>
 		<CardFlip style={styles.cardContainer} ref={(card) => this.card = card} >
           <TouchableOpacity activeOpacity={1} style={styles.container}  >
 				<View style={styles.card} elevation={5}>
@@ -210,8 +244,9 @@ class PointCard extends Component {
 						{this.state.card}
 					</View>
 					<TouchableOpacity
-						onPress={() => {  this.card.flip();
+						onPress={() => {
                                           this.setState({cameraActive: true});
+										  this.card.flip();
                                           this.refreshCard();
                                        }
                                 }
@@ -226,8 +261,9 @@ class PointCard extends Component {
 							shadowRadius: 6,
 							// android (Android +5.0)
 							elevation: 5,}}>
-						<Icon onPress={() => {this.card.flip();
+						<Icon onPress={() => {
                                               this.setState({cameraActive: true});
+											  this.card.flip();
                                               this.refreshCard();
                                           }} name="camera" style={{margin:15,}} size={35} color='white' />
 					</TouchableOpacity>
@@ -250,8 +286,9 @@ class PointCard extends Component {
 					       {this.state.cameraActive && <ScannerQR/>}
 					   </View>
 					<TouchableOpacity
-						onPress={() => { this.card.flip();
+						onPress={() => {
                                          this.setState({cameraActive: false});
+										 this.card.flip();
                                          this.refreshCard();
                                         }}
 						style = {{ marginBottom: 10,
@@ -265,8 +302,9 @@ class PointCard extends Component {
 							shadowRadius: 6,
 							// android (Android +5.0)
 							elevation: 5,}}>
-						<Icon onPress={() => { this.card.flip();
+						<Icon onPress={() => {
                                                this.setState({cameraActive: false});
+											   this.card.flip();
                                                this.refreshCard();
                                         }} name="close" style={{margin:15,}} size={35} color='white' />
 					</TouchableOpacity>
