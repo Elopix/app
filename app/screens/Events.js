@@ -13,10 +13,10 @@ import {
     ListView,
 	TouchableHighlight,
 	Share,
-	Dimensions
+	Dimensions,
+	RefreshControl
 } from 'react-native';
-import {DrawerActions, NavigationActions} from 'react-navigation';
-import UserInput from './UserInput';
+import {DrawerActions, NavigationActions, Header} from 'react-navigation';
 import usernameImg from '../assets/Username.png';
 import passwordImg from '../assets/Password.png';
 import { FormInput } from 'react-native-elements';
@@ -26,9 +26,14 @@ import { TextField } from 'react-native-material-textfield';
 import {COLOR, ThemeContext, getTheme, Toolbar, Card,Checkbox, Drawer} from 'react-native-material-ui';
 import stylesCss from '../assets/css/style.js';
 import Modal from "react-native-modal";
+import HTML from 'react-native-render-html';
+import {BarIndicator} from 'react-native-indicators';
 
 import Api from '../config/api.js';
 import BottomSheet from "react-native-js-bottom-sheet";
+import LinearGradient from 'react-native-linear-gradient';
+
+
 
 var capitalize = require('capitalize')
 
@@ -43,6 +48,20 @@ const uiTheme = {
     },
 };
 
+let months = {'Jan': 'Jan', 
+              'Feb': 'Feb', 
+              'Mar': 'Mrt', 
+              'Apr': 'Apr', 
+              'May': 'Mei', 
+              'Jun': 'Jun', 
+              'Jul': 'Jul', 
+              'Aug': 'Aug', 
+              'Sep': 'Sep', 
+              'Oct': 'Okt', 
+              'Nov': 'Nov', 
+              'Dec': 'Dec'};
+
+
 class Events extends Component {
 
     constructor() {
@@ -51,16 +70,22 @@ class Events extends Component {
         this.state = {
             dataSource: null,
             eventArray: [],
-			modalVisible: false,
-            search: ''
+			      modalVisible: false,
+            adminArray: [],
+            checkMap: new Map(),
+            search: '',
+            refreshing: false,
+            search: '',
         };
+
         let api = Api.getInstance()
         api.callApi('api/getAllEvents', 'POST', {}, response => {
-            if(response['responseCode'] === 200) {
+            if(response['responseCode'] == 200) {
                  let ds = new ListView.DataSource({
                     rowHasChanged: (r1, r2) => r1 !== r2
                 });
                 this.setState({
+					uploading: false,
                     dataSource: ds.cloneWithRows(response['events']),
                 });
             }
@@ -70,44 +95,58 @@ class Events extends Component {
   componentDidMount() {
     this.onLoad();
     this.props.navigation.addListener('willFocus', this.onLoad)
+    this.getAdmins();
   }
 
     onLoad = () => {
     this.refresh();
   }
 
-  refresh(){
-      let api = Api.getInstance()
-      api.callApi('api/getAllEvents', 'POST', {}, response => {
-              let ds = new ListView.DataSource({
-                  rowHasChanged: (r1, r2) => r1 !== r2
-              });
-              this.setState({
-                  firstLoading: false,
-                  dataSource: ds.cloneWithRows(response['events']),
-                  uploading: false,
-              });
-          })
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.refresh();
   }
-  showFilter() {
-  	this.setState({modalVisible: !this.state.modalVisible});
-  };
+
+    refresh(){
+        let api = Api.getInstance()
+        api.callApi('api/getAllEvents', 'POST', {}, response => {
+			this.setState({
+				loading: false
+			});
+
+            if(response['responseCode'] == 200) {
+				console.log(response);
+
+                let ds = new ListView.DataSource({
+                    rowHasChanged: (r1, r2) => r1 !== r2
+                });
+                this.setState({
+                    firstLoading: false,
+                    dataSource: ds.cloneWithRows(response['events']),
+                    uploading: false,
+                });
+            }
+            })
+    }
+    showFilter() {
+		this.setState({modalVisible: !this.state.modalVisible});
+    };
 
  getBackgroundModal(){
  	if(this.state.modalVisible){
  		return {position: 'absolute',
- 	    top: 58,
+ 	    top: 55,
  	    bottom: 0,
  	    left: 0,
  	    right: 0,
  	    backgroundColor: 'rgba(0,0,0,0.5)'}
  	} else {
  		return {position: 'absolute',
- 	    top: 58,
+ 	    top: 55,
  	    bottom: 0,
  	    left: 0,
  	    right: 0,
- 	    backgroundColor: 'rgba(0,0,0,0)'}
+ 	    backgroundColor: 'rgba(0,0,0,0.5)'}
  	}
  }
 
@@ -118,7 +157,7 @@ class Events extends Component {
     }
     api.callApi('api/searchEvent', 'POST', userData, response => {
         if(response['responseCode'] == 200) {
-                console.log(response);
+                console.log(response['events']);
               let ds = new ListView.DataSource({
                   rowHasChanged: (r1, r2) => r1 !== r2
               });
@@ -131,10 +170,49 @@ class Events extends Component {
     });
  }
 
+  getAdmins() {
+    api = Api.getInstance();
+    api.callApi('api/getAllAdmins', 'POST', {}, response => {
+      if(response['responseCode'] == 200) {
+            // for(admin in response['admins']){
+            //   console.log("ADMIN :::::::::::" + admin)
+            //   this.adminArray.push(admin);
+            // }
+            // }
+            // return response['admins'];
+          console.log(this.state)
+          this.setState({
+            adminArray: response['admins']
+          })
+          this.initFilterOptions();
+          console.log(this.state)
+
+        }
+      })
+  }
+
+  renderModalContent() {
+    return(
+      <Text style={{fontWeight: 'bold'}}>Filter op evenementen met begeleider</Text>
+
+    )
+  }
+
+  initFilterOptions() {
+      this.state.adminArray.map((admin) => {
+        this.state.checkMap.set(admin.id, false);
+        });
+  }
+
+
 
     render() {
         return(
-            <ImageBackground  blurRadius={3} source={require('../assets/sport_kids_bslim.jpg')} style={{width: '100%', height: '100%'}}>
+            <ImageBackground  blurRadius={0} source={require('../assets/background.jpg')} style={{width: '100%', height: '100%'}}>
+			<LinearGradient
+			  colors={['#94D600', '#76C201', '#94D600', '#76C201', '#94D600', '#76C201', '#94D600', '#76C201', '#94D600', '#76C201', '#94D600', '#76C201', '#94D600', '#76C201','#94D600', '#76C201', '#94D600', '#76C201']}
+			  style={{ height: Header.HEIGHT}}
+			 >
                 <Toolbar
                     centerElement={"Evenementen"}
                     searchable={{
@@ -146,7 +224,15 @@ class Events extends Component {
                     rightElement={("filter-list")}
                     onRightElementPress={()=> this.showFilter()}
                 />
+				</LinearGradient>
 				<View style={this.getBackgroundModal()}>
+
+				{this.state.loading &&
+					<BarIndicator color='white' />
+
+				}
+				{!this.state.loading &&
+				<View >
 				<Modal
 		          animationType="slide"
 				  style={{margin: 0, marginTop: 120}}
@@ -157,39 +243,46 @@ class Events extends Component {
 		          }}>
 		          <View style={{marginTop: 120, borderRadius: 10, margin: 0, height: '100%', backgroundColor: 'white'}}>
 		            <View>
-		              <TouchableHighlight
-		                onPress={() => {
-		                  this.setModalVisible(!this.state.modalVisible);
-		                }}>
-		              </TouchableHighlight>
+
 		            </View>
 		          </View>
 		        </Modal>
                 {
                     this.state.dataSource != null &&
                     <ListView
+					   contentContainerStyle={{paddingTop: 20}}
+						refreshControl={
+					          <RefreshControl
+							  colors={['#94D600']}
+					            refreshing={this.state.refreshing}
+					            onRefresh={this._onRefresh}
+					          />
+					        }
                         dataSource={this.state.dataSource}
-						style={{paddingTop: 20, marginBottom: 55, paddingBottom: 300}}
+						style={{paddingTop: 10, marginBottom: 55}}
                         renderRow={(rowData) =>
                            <View style={styles.container}>
                                 <View style={styles.card} elevation={5}>
-                                    <View style={{flex: 1, flexDirection: 'row', margin: 10}}>
-                                    {console.log(rowData)}
-                                        <Image
-                                            source={{uri: 'data:image/jpg;base64,' + rowData.photo[0]}}
-                                            style={{width: 50, height: 50, borderRadius: 10}}
-                                        />
-                                        <View style={{flex: 1, flexDirection: 'column', marginLeft: 8}}>
+
+
+                                    <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', margin: 10}}>
+									<Image
+										source={{uri: rowData.photo[0]}}
+										resizeMode="cover"
+										style={{width: 50, height: 50, borderRadius: 10}}
+									/>
+                                        <View style={{flex: 1, flexDirection: 'column', marginLeft: 10}}>
+
+
                                             <Text
 											style={{
-                                                marginBottom: 3,
                                                 fontWeight: 'bold',
-                                                fontSize: 20,
+                                                fontSize: 18,
                                                 color: 'black'
                                             }}>
-                                                {capitalize.words(rowData.leader.toString().replace(', ,', ' '))}
+                                                {capitalize.words(rowData.leader[0][0]) + ' ' + capitalize.words(rowData.leader[2][0])}
                                             </Text>
-                                            <Text style={{fontSize: 16, color: 'black'}}>
+                                            <Text style={{fontSize: 14, color: 'black'}}>
                                                 {rowData.created}
                                             </Text>
                                         </View>
@@ -201,20 +294,35 @@ class Events extends Component {
                                         borderBottomLeftRadius: 10,
                                         borderBottomRightRadius: 10,
                                     }}>
+                                        <TouchableHighlight
+                                            onPress={() => this.props.navigation.navigate('EventDetail', {
+                                                title: capitalize.words(rowData.name.toString().replace(', ,', ' ')),
+                                                profilePicture: rowData.photo[0],
+                                                content: rowData.desc,
+                                                start: rowData.begin + ' ' + rowData.beginMonth,
+                                                end: rowData.end,
+                                                created: rowData.created,
+                                                author: capitalize.words(rowData.leader[0][0].replace(', ,', ' ')),
+                                                link: rowData.link,
+                                                img: rowData.img,
+                                                location: rowData.location,
+                                            })}
+                                        >
                                         <Image
-                                            source={{uri: 'data:image/jpg;base64,' + rowData.img}}
+                                            source={{uri: rowData.img}}
                                             resizeMode="cover"
                                             style={{width: '100%', height: 200}}
                                         />
+                                        </TouchableHighlight>
                                         <View style={{flex: 1, flexDirection: 'row', width: '80%'}} >
                                             <View style={{
-                                                minWidth: '18%',
-                                                maxHeight: '60%',
+                                                minWidth: 50,
+                                                maxHeight: 50,
                                                 backgroundColor: '#F27B13',
                                                 marginTop: 10,
                                                 borderRadius: 5,
-                                                marginLeft: 5,
-                                                marginRight: 5
+                                                marginLeft: 10,
+                                                marginRight: 10
                                             }}>
                                                 <View style={{flex: 1, flexDirection: 'column'}}>
                                                     <Text style={{
@@ -222,7 +330,7 @@ class Events extends Component {
                                                         fontSize: 16,
                                                         color: 'white',
                                                         textAlign: 'center',
-                                                        marginTop: 9
+                                                        marginTop: 5
                                                     }}>
                                                         {rowData.begin}
                                                     </Text>
@@ -232,25 +340,25 @@ class Events extends Component {
                                                         color: 'white',
                                                         textAlign: 'center'
                                                     }}>
-                                                        {rowData.beginMonth}
+                                                        { months[rowData.beginMonth]}
                                                     </Text>
                                                 </View>
 
                                             </View>
                                             <View style={{
-                                                margin: 5,
-                                                marginLeft: 1,
+												marginTop: 10,
+                                                marginRight: 10,
                                                 marginBottom: 30,
                                                 fontWeight: 'bold'
                                             }}>
-                                                <Text style={{fontWeight: 'bold', fontSize: 20, color: 'black'}}>
+                                                <Text style={{fontWeight: 'bold', fontSize: 18, color: 'black'}}>
 												{capitalize.words(rowData.name.toString().replace(', ,', ' '))}
                                                 </Text>
-                                                <Text numberOfLines={3} ellipsizeMode="tail" style={{fontSize: 12}}>
-                                                    {rowData.desc}
-                                                </Text>
+												<HTML tagsStyles={{ p: { textAlign: 'left', color: 'grey' } }} onLinkPress={(evt, href) => { Linking.openURL(href); }} ignoredTags={['img']} html={rowData.desc} imagesMaxWidth={Dimensions.get('window').width } />
+
                                             </View>
-                                        </View>
+
+                                        </View >
 
                                         <View style={{
                                             flex: 1,
@@ -265,7 +373,7 @@ class Events extends Component {
 											title: capitalize.words(rowData.name.toString().replace(', ,', ' ')),
 											profilePicture: rowData.photo[0],
 											content: rowData.desc,
-											start: rowData.begin + ' ' + rowData.beginMonth,
+											start: rowData.begin,
 											end: rowData.end,
 											created: rowData.created,
 											author: capitalize.words(rowData.leader.toString().replace(', ,', ' ')),
@@ -294,6 +402,8 @@ class Events extends Component {
                     />
                 }
 				</View>
+			}
+			</View>
             </ImageBackground>
 
 
@@ -323,6 +433,7 @@ backgroundColor: 'rgba(0,0,0,0)'
     container: {
         flex: 1,
         justifyContent: 'center',
+        marginBottom:20
     },
     card: {
         backgroundColor: 'white',
