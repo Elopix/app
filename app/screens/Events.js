@@ -56,7 +56,7 @@ class Events extends Component {
         };
         let api = Api.getInstance()
         api.callApi('api/getAllEvents', 'POST', {}, response => {
-            if(response['responseCode'] == 200) {
+            if(response['responseCode'] === 200) {
                  let ds = new ListView.DataSource({
                     rowHasChanged: (r1, r2) => r1 !== r2
                 });
