@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 {
   "name": "bslim_upload",
   "displayName": "Bslim 050"
 }
+=======
+{
+  "name": "bslim_upload",
+  "displayName": "bslim_upload"
+}
+>>>>>>> upstream/master
