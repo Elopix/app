@@ -4,7 +4,7 @@ import LocalStorage from './localStorage.js';
 export default class Api {
 
 	static instance = null;
-	url= "145.37.30.142:5000"
+	url= "http://145.37.28.128:5000/"
 
 
 	static getInstance() {

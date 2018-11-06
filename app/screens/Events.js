@@ -263,14 +263,29 @@ class Events extends Component {
                         renderRow={(rowData) =>
                            <View style={styles.container}>
                                 <View style={styles.card} elevation={5}>
-
+                                    <TouchableHighlight
+                                        onPress={() => this.props.navigation.navigate('ProfilePage', {
+                                            title: capitalize.words(rowData.name.toString().replace(', ,', ' ')),
+                                            profilePicture: rowData.photo[0],
+                                            content: rowData.desc,
+                                            start: rowData.begin + ' ' + rowData.beginMonth,
+                                            end: rowData.end,
+                                            created: rowData.created,
+                                            author: capitalize.words(rowData.leader[0][0].replace(', ,', ' ')),
+                                            link: rowData.link,
+                                            img: rowData.img,
+                                            location: rowData.location,
+                                            leaderId: rowData.leaderId
+                                        })}
+                                    >
 
                                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', margin: 10}}>
-									<Image
+
+                                        <Image
 										source={{uri: rowData.photo[0]}}
 										resizeMode="cover"
 										style={{width: 50, height: 50, borderRadius: 10}}
-									/>
+                                        />
                                         <View style={{flex: 1, flexDirection: 'column', marginLeft: 10}}>
 
 
@@ -286,7 +301,7 @@ class Events extends Component {
                                                 {rowData.created}
                                             </Text>
                                         </View>
-                                    </View>
+                                    </View></TouchableHighlight>
 
                                     <View style={{
                                         backgroundColor: 'white',

@@ -213,8 +213,10 @@ export default class MakeNewsItem extends Component {
 								textColor='green'
              					tintColor='green'
              					baseColor='green'
-		  						label="Content"
-          						value={ this.state.content }
+		  						label="Inhoud"
+								multiline={true}
+								numberOfLines={30}
+								value={ this.state.content }
           						onChangeText={ content => this.setState({content}) }
 							/>
 

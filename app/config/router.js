@@ -4,16 +4,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { NavigationComponent } from 'react-native-material-bottom-navigation-performance'
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-import {Image,Alert,Button} from 'react-native';
-=======
 import {Image, Button, View, StyleSheet, Dimensions, TextInput} from 'react-native';
-=======
-import {Image, Button, View, StyleSheet, Dimensions} from 'react-native';
->>>>>>> upstream/master
 import LinearGradient from 'react-native-linear-gradient';
->>>>>>> upstream/master
 
 import ScannerQR from '../screens/ScannerQR';
 import Upload from '../screens/Upload';
@@ -33,6 +25,8 @@ import MakeEvent from '../screens/MakeEvent';
 import MakeNewsItem from '../screens/MakeNewsItem';
 import CreateAdmin from '../screens/CreateAdmin';
 import Events from '../screens/Events';
+import ProfilePage from '../screens/ProfilePage';
+
 import Filter from '../screens/Filter';
 
 //Gradient header
@@ -84,17 +78,19 @@ export const AdminStack = StackNavigator({
         }
     },
     MakeNewsItem: {
-      screen: MakeNewsItem,
-      navigationOptions: {
-        title: 'Nieuw artikel',
-      }
+        screen: MakeNewsItem,
+        navigationOptions: {
+            title: 'Nieuw artikel',
+        }
     },
     CreateAdmin: {
         screen: CreateAdmin,
         navigationOptions: {
             title: 'Nieuw begeleider account',
         }
-    }
+    },
+
+
 },{headerMode: 'none'
 })
 
@@ -128,9 +124,16 @@ export const EventStack = StackNavigator({
         navigationOptions: {
             title: 'Evenementen',
         }
+    },
+    ProfilePage: {
+        screen: ProfilePage,
+        navigationOptions: {
+            title: 'Profile',
+        }
     }
 },{headerMode: 'none'
 })
+
 
 
 //Stack for participants
@@ -335,6 +338,12 @@ export const MyAppLoggedIn = StackNavigator({
 			header: null,
 		}
 	},
+    LoginStack: {
+        screen: LoginStack,
+        navigationOptions: {
+            header: null,
+        }
+    },
 	ParticipantListStack: {
 		screen: ParticipantListStack,
 		navigationOptions: {

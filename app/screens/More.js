@@ -216,6 +216,16 @@ export default class More extends Component {
                      }
                }),
                },
+                {
+                    icon: <Icon size={25} name={ 'calendar-plus' } style={{ color: 'grey' }} />,
+                    value: 'Profiel pagina',
+                    key: '13',
+                    onPress: () => this.props.navigation.dispatch(NavigationActions.navigate({
+                            routeName: 'ParticipantListStack',
+                            action: NavigationActions.navigate({ routeName: 'ProfilePage' })
+                        })
+                    )
+                },
             ]}
         />
         }
